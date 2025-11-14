@@ -1,36 +1,56 @@
-export class PeticionesGestion {
-     
-    constructor (){
+import { Mutex } from 'async-mutex';
+const mutex = new Mutex();
 
+export class PeticionesGestion {
+   
+    constructor (){
+        this.colaPeticiones = [];
     }
 
     static async EncolarPeticion(peticion)
     {
         try 
         {
-            var algo = peticion;
+            const release = await mutex.acquire(); // Acquire the lock
             
+            let peticionPendiente = new PeticionPendienteDTO(peticion);
 
-        } catch (error) {
-            
-        }
-        
+            this.colaPeticiones.push(peticionPendiente);
+        } 
+        catch (error) 
+        {
+            console.log("Error al encolar la peticion: " + error);
+        } 
+        finally 
+        {
+            release(); // Release the lock
+        }        
     }
     
     AsignarPeticion(peticion, respuesta)
     {
-        try {
+        try 
+        {
             
-        } catch (error) {
+        } 
+        catch (error) 
+        {
             
         }
     }
 
-    DespacharPeticiones(){
+    static async DespacharPeticiones(){
         
-        try {
-            
-        } catch (error) {
+        try 
+        {
+            const release = await mutex.acquire();
+            while(this.colaPeticiones.length > 0){
+                const peticion = this.colaPeticiones.shift();
+                // Procesar la peticion
+            }
+        } 
+        catch (error) 
+        {
             
         }
     }
