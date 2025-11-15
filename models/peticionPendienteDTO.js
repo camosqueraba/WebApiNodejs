@@ -1,14 +1,14 @@
-import PeticionPendienteDTO from './peticionPendienteDTO.js';
-import variablesConfiguracion from '../config/variablesConfiguracion.js';
+import { variablesParametrizacion } from '../config/appSettings.js';
+import PeticionDTO from './peticionDTO.js';
 
-class PeticionPendienteDTO extends PeticionPendienteDTO {
+class PeticionPendienteDTO extends PeticionDTO {
     constructor(peticion) {
         super(peticion);
         
         this.tiempoMaximoEspera = new Date();
         this.tiempoMaximoEspera.setSeconds(
             this.tiempoMaximoEspera.getSeconds() + 
-            variablesConfiguracion.TIEMPO_MAXIMO_ESPERA_SEGUNDOS);
+            variablesParametrizacion.TIEMPO_MAXIMO_ESPERA_SEGUNDOS);
     }
 }
 

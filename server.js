@@ -17,9 +17,7 @@ try
     const PORT = process.env.PORT || 3000;
        
     const server = http.createServer(app);
-    console.log("typeof server:", typeof server);
-    console.log("constructor:", server.constructor?.name);
-
+    
     const webSocketServer = new WebSocketServer({ server }); // comparte el mismo servidor HTTP
 
     webSocketServer.on('connection', (ws) => {

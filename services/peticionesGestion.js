@@ -1,30 +1,35 @@
+import   PeticionPendienteDTO   from '../models/peticionPendienteDTO.js';
 import { Mutex } from 'async-mutex';
-const mutex = new Mutex();
+const mutexColaPeticiones = new Mutex();
 
 export class PeticionesGestion {
    
+    static colaPeticiones = [];
+
     constructor (){
-        this.colaPeticiones = [];
+        
     }
 
     static async EncolarPeticion(peticion)
     {
         try 
-        {
-            const release = await mutex.acquire(); // Acquire the lock
-            
+        {  
             let peticionPendiente = new PeticionPendienteDTO(peticion);
 
-            this.colaPeticiones.push(peticionPendiente);
+            await mutexColaPeticiones.runExclusive( async () => {
+                
+                this.colaPeticiones.push(peticionPendiente);
+            });
+          
         } 
         catch (error) 
         {
             console.log("Error al encolar la peticion: " + error);
-        } 
-        finally 
+        }
+        finally
         {
-            release(); // Release the lock
-        }        
+            DespacharPeticiones();
+        }      
     }
     
     AsignarPeticion(peticion, respuesta)
@@ -43,11 +48,21 @@ export class PeticionesGestion {
         
         try 
         {
-            const release = await mutex.acquire();
-            while(this.colaPeticiones.length > 0){
-                const peticion = this.colaPeticiones.shift();
-                // Procesar la peticion
-            }
+            let colaPeticionesTemporal = [];
+
+            await mutexColaPeticiones.runExclusive( async () => {
+                while(this.colaPeticiones.length > 0)
+                {
+                    const peticion = this.colaPeticiones.shift();
+                    if (new Date() > peticion.tiempoMaximoEspera)
+                    {
+                        // Tiempo de espera excedido, manejar el caso
+                        console.log(`Peticion ${peticion.id} excedió el tiempo máximo de espera.`);
+                    }
+                    // Procesar la peticion
+                    colaPeticionesTemporal.push(peticion);
+                }
+            });
         } 
         catch (error) 
         {
