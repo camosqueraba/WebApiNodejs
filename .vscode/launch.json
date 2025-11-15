@@ -4,7 +4,7 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
-    
+        
         {
             "type": "node",
             "request": "launch",
@@ -12,7 +12,13 @@
             "skipFiles": [
                 "<node_internals>/**"
             ],
-            "program": "${workspaceFolder}\\server.js"
+            "runtimeArgs": ["--loader", "ts-node/register"], // Or use "--require ts-node/register --esm" for older ts-node versions
+            "args": ["${workspaceFolder}/server.ts"],
+            "program": "${workspaceFolder}\\src\\server.ts",
+            "preLaunchTask": "tsc: build - tsconfig.json",
+            "outFiles": [
+                "${workspaceFolder}/dist/**/*.js"
+            ]
         }
     ]
 }
